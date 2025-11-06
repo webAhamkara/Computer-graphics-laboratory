@@ -18,16 +18,19 @@ export function vertexRendering(
 	x0,
 	y0,
 	z0,
+	I0,
 	u0,
 	v0,
 	x1,
 	y1,
 	z1,
+	I1,
 	u1,
 	v1,
 	x2,
 	y2,
 	z2,
+	I2,
 	u2,
 	v2
 ) {
@@ -66,11 +69,26 @@ export function vertexRendering(
 				)
 				textureX = Math.max(0, Math.min(width - 1, textureX))
 				textureY = Math.max(0, Math.min(height - 1, textureY))
-				const color = textures.getPixelColor(textureX, textureY)
+				const textureColor = textures.getPixelColor(textureX, textureY)
+				let I =
+					-225 *
+					(result.lambda0 * I0 + result.lambda1 * I1 + result.lambda2 * I2)
+				I = Math.max(0, Math.min(255, Math.round(I))) / 255 //защита от очень ярких или очень темных участков, делим на 255 для попадания в отрезок [0,1] для получения коэффициента яркости
+				let r = (textureColor >> 24) & 0xff
+				let g = (textureColor >> 16) & 0xff
+				let b = (textureColor >> 8) & 0xff
+				r = Math.min(255, Math.floor(r * I))
+				g = Math.min(255, Math.floor(g * I))
+				b = Math.min(255, Math.floor(b * I))
+				const finalColor = ((r << 24) | (g << 16) | (b << 8) | 0xff) >>> 0
 				const z =
 					result.lambda0 * z0 + result.lambda1 * z1 + result.lambda2 * z2
 				if (z < zBuffer[countX][countY]) {
-					image.setPixelColor(color, Math.round(countX), Math.round(countY))
+					image.setPixelColor(
+						finalColor,
+						Math.round(countX),
+						Math.round(countY)
+					)
 					zBuffer[countX][countY] = z
 				}
 			}

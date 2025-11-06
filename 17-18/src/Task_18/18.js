@@ -34,10 +34,6 @@ fs.readFile(
 				})
 			}
 		}
-		const vertexCount = new Array(xArray.length).fill(0)
-		const vertexNormalsX = new Array(xArray.length).fill(0)
-		const vertexNormalsY = new Array(yArray.length).fill(0)
-		const vertexNormalsZ = new Array(zArray.length).fill(0)
 
 		const polygons = []
 		const l = [0, 0, 1]
@@ -58,11 +54,6 @@ fs.readFile(
 			}
 		}
 
-		for (let i = 0; i < polygons.length; i++) {
-			vertexCount[polygons[i].vertices[0]] += 1 //polygons[i].vertices[0] это номер вершины которая есть в полигоне
-			vertexCount[polygons[i].vertices[1]] += 1
-			vertexCount[polygons[i].vertices[2]] += 1
-		}
 		try {
 			const rabbitTextures = await Jimp.read(
 				'C:/Users/Slava/Desktop/Проекты/Графика/17-18/src/Task_18/bunny-atlas.jpg'
@@ -74,7 +65,6 @@ fs.readFile(
 			})
 
 			const zBuffer = []
-			const arrayCos = new Array(polygons.length).fill(0)
 			let allX = 0,
 				allY = 0,
 				allZ = 0
@@ -98,7 +88,14 @@ fs.readFile(
 
 			const transformedVertices = []
 			for (let j = 0; j < xArray.length; j++) {
-				const newCoordinates = rotate(xArray[j], yArray[j], zArray[j], 0, 0, 0)
+				const newCoordinates = rotate(
+					xArray[j],
+					yArray[j],
+					zArray[j],
+					0,
+					3.7,
+					0
+				)
 				xArray[j] = newCoordinates.x
 				yArray[j] = newCoordinates.y
 				zArray[j] = newCoordinates.z
@@ -109,71 +106,39 @@ fs.readFile(
 					x3D: xTransformed,
 					y3D: yTransformed,
 					z3D: zTransformed,
-					screenX: Math.round((Ax * xTransformed) / zTransformed + 500),
-					screenY: Math.round((Ay * yTransformed) / zTransformed + 500),
+					screenX: Math.round(
+						(Ax * xTransformed) / zTransformed + rabbitTextures.width / 2
+					),
+					screenY: Math.round(
+						(Ay * yTransformed) / zTransformed + rabbitTextures.width / 2
+					),
 				}
-			}
-
-			for (let c = 0; c < polygons.length; c++) {
-				//рисуем ребра(полигоны)
-				const [id1, id2, id3] = polygons[c].vertices
-				const normal = calculatingTheNormal(
-					xArray[id1],
-					yArray[id1],
-					zArray[id1],
-					xArray[id2],
-					yArray[id2],
-					zArray[id2],
-					xArray[id3],
-					yArray[id3],
-					zArray[id3]
-				)
-				vertexNormalsX[id1] += normal.normalX //заполняем по номеру вершины соответствующие нормали
-				vertexNormalsY[id1] += normal.normalY
-				vertexNormalsZ[id1] += normal.normalZ
-
-				vertexNormalsX[id2] += normal.normalX
-				vertexNormalsY[id2] += normal.normalY
-				vertexNormalsZ[id2] += normal.normalZ
-
-				vertexNormalsX[id3] += normal.normalX
-				vertexNormalsY[id3] += normal.normalY
-				vertexNormalsZ[id3] += normal.normalZ
-				const cos = calculatingTheCos(
-					normal.normalX,
-					normal.normalY,
-					normal.normalZ,
-					l
-				)
-				arrayCos[c] = cos
 			}
 
 			for (let j = 0; j < polygons.length; j++) {
 				const [id1, id2, id3] = polygons[j].vertices
-				if (arrayCos[j] < 0) {
-					vertexRendering(
-						zBuffer,
-						image,
-						rabbitTextures,
-						rabbitTextures.width,
-						rabbitTextures.height,
-						transformedVertices[id1].screenX,
-						transformedVertices[id1].screenY,
-						transformedVertices[id1].z3D,
-						textures[polygons[j].textures[0]].x,
-						textures[polygons[j].textures[0]].y,
-						transformedVertices[id2].screenX,
-						transformedVertices[id2].screenY,
-						transformedVertices[id2].z3D,
-						textures[polygons[j].textures[1]].x,
-						textures[polygons[j].textures[1]].y,
-						transformedVertices[id3].screenX,
-						transformedVertices[id3].screenY,
-						transformedVertices[id3].z3D,
-						textures[polygons[j].textures[2]].x,
-						textures[polygons[j].textures[2]].y
-					)
-				}
+				vertexRendering(
+					zBuffer,
+					image,
+					rabbitTextures,
+					rabbitTextures.width,
+					rabbitTextures.height,
+					transformedVertices[id1].screenX,
+					transformedVertices[id1].screenY,
+					transformedVertices[id1].z3D,
+					textures[polygons[j].textures[0]].x,
+					1 - textures[polygons[j].textures[0]].y,
+					transformedVertices[id2].screenX,
+					transformedVertices[id2].screenY,
+					transformedVertices[id2].z3D,
+					textures[polygons[j].textures[1]].x,
+					1 - textures[polygons[j].textures[1]].y,
+					transformedVertices[id3].screenX,
+					transformedVertices[id3].screenY,
+					transformedVertices[id3].z3D,
+					textures[polygons[j].textures[2]].x,
+					1 - textures[polygons[j].textures[2]].y
+				)
 			}
 
 			await image.write('rabbit_textures.png')

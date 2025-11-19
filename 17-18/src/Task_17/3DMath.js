@@ -51,7 +51,7 @@ export function vertexRendering(
 				result.lambda2 >= -0.005
 			) {
 				const I =
-					-225 *
+					-255 *
 					(result.lambda0 * I0 + result.lambda1 * I1 + result.lambda2 * I2)
 				let color = Math.max(0, Math.min(255, Math.round(I)))
 				color = (color << 24) | (color << 16) | (color << 8) | 0xff

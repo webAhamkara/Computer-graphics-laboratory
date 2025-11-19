@@ -8,7 +8,7 @@ import {
 } from './3DMath.js'
 
 fs.readFile(
-	'C:/Users/Slava/Desktop/Проекты/model_1.obj',
+	'C:/Users/Slava/Desktop/Проекты/Графика/sources/model_1.obj',
 	'utf8',
 	async (err, data) => {
 		if (err) {
@@ -66,7 +66,7 @@ fs.readFile(
 
 		try {
 			const rabbitTextures = await Jimp.read(
-				'C:/Users/Slava/Desktop/Проекты/Графика/17-18/src/Task_18/bunny-atlas.jpg'
+				'C:/Users/Slava/Desktop/Проекты/Графика/sources/bunny-atlas.jpg'
 			)
 			const image = new Jimp({
 				width: rabbitTextures.width,

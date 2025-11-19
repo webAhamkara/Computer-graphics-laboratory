@@ -8,7 +8,7 @@ import {
 } from './3DMath.js'
 
 fs.readFile(
-	'C:/Users/Slava/Desktop/Проекты/model_1.obj',
+	'C:/Users/Slava/Desktop/Проекты/Графика/sources/model_1.obj',
 	'utf8',
 	async (err, data) => {
 		if (err) {
